@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import emailjs from "emailjs-com";
 
 const githubLogo = "/github.png";
 const linkedinLogo = "/linkedin.png";
@@ -25,7 +24,7 @@ export default function Contact() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!form.name || !form.contact || !form.subject || !form.message) {
@@ -40,30 +39,33 @@ export default function Contact() {
       return;
     }
 
-    setStatus("Sending...");
+    setStatus("📤 Sending...");
 
-    emailjs
-      .send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        {
-          from_name: form.name,
-          contact_info: form.contact,
-          subject: form.subject,
-          message: form.message,
-        },
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-      )
-      .then(
-        () => {
-          setStatus("✅ Message sent successfully!");
-          setForm({ name: "", contact: "", subject: "", message: "" });
-        },
-        (error) => {
-          console.error("FAILED...", error);
-          setStatus("❌ Failed to send. Try again later.");
-        }
-      );
+    try {
+      const formData = new FormData();
+      formData.append("access_key", "d790737c-ee04-4ee1-8b9a-ece07ebae22e");
+      formData.append("name", form.name);
+      formData.append("email", form.contact);
+      formData.append("subject", form.subject);
+      formData.append("message", form.message);
+
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setStatus("✅ Message sent successfully!");
+        setForm({ name: "", contact: "", subject: "", message: "" });
+      } else {
+        setStatus("❌ Failed to send. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setStatus("❌ Failed to send. Please try again later.");
+    }
   };
 
   const quickLinks = [

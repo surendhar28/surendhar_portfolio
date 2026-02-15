@@ -8,7 +8,7 @@ const IMAGES = {
     {
       id: 1,
       caption: "Capture The Moment 📸 Professional vibes",
-      photos: ["/gallery/personal1.jpg"],
+      photos: ["/gallery/personal1.jpeg"],
     },
     {
       id: 2,
@@ -19,6 +19,11 @@ const IMAGES = {
       id: 3,
       caption: "Ready to ride into the unknown 🏍️✨ Gear up and go!",
       photos: ["/gallery/personal3.jpg"],
+    },
+    {
+      id: 4,
+      caption: "Strumming through life 🎸✨ Where code meets chords!",
+      photos: ["/gallery/personal4.jpeg"],
     },
   ],
   projects: [
