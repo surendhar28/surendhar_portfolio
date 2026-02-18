@@ -19,7 +19,7 @@ export default function Home() {
     'Frontend Developer',
     'Generative AI Engineer',
     'UI/UX Designer',
-    'Full Stack Developer',
+    'MERN Developer(Beginner)',
     'AI Enthusiast',
   ]
 
