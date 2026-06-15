@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Volume2, VolumeX, Play, RotateCcw } from 'lucide-react'
+import { Volume2, VolumeX, RotateCcw } from 'lucide-react'
 import '../CSS/VirtualAvatar.css'
 
 export default function VirtualAvatar() {
@@ -10,24 +10,25 @@ export default function VirtualAvatar() {
   const [isHovered, setIsHovered] = useState(false)
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0)
   const [showSpeech, setShowSpeech] = useState(true)
-  const [typedText, setTypedText] = useState('')
   
-  // Voice & Equalizer state
+  // Voice, captions, & animations state
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
+  const [currentWordIndex, setCurrentWordIndex] = useState(-1)
   const [voices, setVoices] = useState([])
   const [selectedVoiceName, setSelectedVoiceName] = useState('')
   const currentUtteranceRef = useRef(null)
 
   const photo = '/photo.jpg'
+  const totalEqualizerBars = 32
 
   const messages = [
-    "Hello! I am Surendhar's virtual double, powered by built-in browser voice. Welcome to my page! 🎙️",
-    "Notice how my portrait tilts in 3D to look towards your cursor. Pretty interactive, right? 👀",
-    "I specialize in React, Vite, Framer Motion, and Generative AI to construct premium web interfaces. 💻",
-    "My skills are interactive floating physics balls in the Skills tab. Make sure to check them out! ⚽",
-    "Click on my portrait to cycle through my thoughts, or speak to me via the Contact form! 📩",
-    "I was built using standard HTML5 Canvas, Web Speech synthesis, and custom React hooks! 🚀"
+    "Hello! I am Surendhar's virtual double. Welcome to my digital workspace! 🎙️",
+    "Notice how my portrait tilts to follow your cursor movement around the screen. 👀",
+    "I specialize in building rich web experiences using React, Vite, and Generative AI. 💻",
+    "Make sure to check out the Skills page to see my interactive floating skills network! ⚽",
+    "Click on my photo at any time to skip my message or check out more logs! 🤖",
+    "If you want to collaborate on a new project, drop me a line in the Contact tab! 📩"
   ]
 
   // Track global mouse movement for 3D perspective tilt
@@ -60,25 +61,6 @@ export default function VirtualAvatar() {
     setHeadRotation({ x: rotX, y: rotY })
   }, [mousePos])
 
-  // Typewriter effect for speech bubble
-  useEffect(() => {
-    let timer
-    const message = messages[currentMessageIndex]
-    setTypedText('')
-    
-    let i = 0
-    const type = () => {
-      if (i < message.length) {
-        setTypedText(prev => prev + message.charAt(i))
-        i++
-        timer = setTimeout(type, 20) // Typing speed
-      }
-    }
-    
-    type()
-    return () => clearTimeout(timer)
-  }, [currentMessageIndex])
-
   // Load and monitor system voices
   useEffect(() => {
     const loadVoices = () => {
@@ -108,18 +90,19 @@ export default function VirtualAvatar() {
     }
   }, [])
 
-  // Trigger speech function
+  // Trigger speech function with boundary tracking (karaoke captions)
   const speakText = (text) => {
     if (typeof window === 'undefined' || !window.speechSynthesis) return
 
     // Stop current speaking
     window.speechSynthesis.cancel()
     setIsSpeaking(false)
+    setCurrentWordIndex(-1)
 
     if (isMuted) return
 
     // Create utterance
-    const cleanText = text.replace(/[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD00-\uDFFF]/g, '') // remove emojis for smoother reading
+    const cleanText = text.replace(/[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD00-\uDFFF]/g, '')
     const utterance = new SpeechSynthesisUtterance(cleanText)
     
     // Assign voice
@@ -130,17 +113,38 @@ export default function VirtualAvatar() {
       }
     }
 
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
+    utterance.onstart = () => {
+      setIsSpeaking(true)
+      setCurrentWordIndex(0)
+    }
+
+    // Word boundary tracking for captions
+    utterance.onboundary = (event) => {
+      if (event.name === 'word') {
+        const charIndex = event.charIndex
+        const textBeforeBoundary = event.target.text.substring(0, charIndex)
+        // Count words spoken so far
+        const wordCount = textBeforeBoundary.trim().split(/\s+/).filter(Boolean).length
+        setCurrentWordIndex(wordCount)
+      }
+    }
+
+    utterance.onend = () => {
+      setIsSpeaking(false)
+      setCurrentWordIndex(-1)
+    }
+
+    utterance.onerror = () => {
+      setIsSpeaking(false)
+      setCurrentWordIndex(-1)
+    }
 
     currentUtteranceRef.current = utterance
     window.speechSynthesis.speak(utterance)
   }
 
-  // Speak when message changes (only if not muted and clicked or already speaking)
+  // Speak when message/voice changes
   useEffect(() => {
-    // We only autotalk on mount if user clicks first, or when they transition messages
     speakText(messages[currentMessageIndex])
   }, [currentMessageIndex, selectedVoiceName, isMuted])
 
@@ -161,6 +165,7 @@ export default function VirtualAvatar() {
     if (nextMuted) {
       window.speechSynthesis.cancel()
       setIsSpeaking(false)
+      setCurrentWordIndex(-1)
     }
   }
 
@@ -169,9 +174,12 @@ export default function VirtualAvatar() {
     setSelectedVoiceName(e.target.value)
   }
 
+  // Split the current message into words for the synced caption highlighter
+  const captionWords = messages[currentMessageIndex].split(' ')
+
   return (
     <div className="avatar-container" ref={avatarRef}>
-      {/* Speech Bubble */}
+      {/* Synchronized Captions Speech Bubble */}
       <AnimatePresence>
         {showSpeech && (
           <motion.div
@@ -180,13 +188,27 @@ export default function VirtualAvatar() {
             exit={{ opacity: 0, scale: 0.8, y: 10 }}
             className="speech-bubble"
           >
-            <p className="speech-text">{typedText}</p>
+            <p className="speech-text">
+              {captionWords.map((word, idx) => {
+                let wordClass = "caption-word"
+                if (idx === currentWordIndex) {
+                  wordClass += " active-word"
+                } else if (idx < currentWordIndex) {
+                  wordClass += " read-word"
+                }
+                return (
+                  <span key={idx} className={wordClass}>
+                    {word}
+                  </span>
+                )
+              })}
+            </p>
             <button className="speech-close" onClick={() => setShowSpeech(false)}>×</button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Floating 3D Base */}
+      {/* Floating 3D base frame */}
       <motion.div
         className="avatar-wrapper"
         animate={{ y: [0, -10, 0] }}
@@ -202,19 +224,31 @@ export default function VirtualAvatar() {
         {/* Glow Ring behind Avatar */}
         <div className={`avatar-glow-ring ${isHovered || isSpeaking ? 'active' : ''}`} />
 
-        {/* Real Photo with Glowing Speaking Border */}
+        {/* Concentric Speech Ripple Rings */}
+        <div className={`ripple-ring ${isSpeaking ? 'speaking' : ''}`} />
+        <div className={`ripple-ring ${isSpeaking ? 'speaking' : ''}`} />
+        <div className={`ripple-ring ${isSpeaking ? 'speaking' : ''}`} />
+
+        {/* Real Photo Card with Glowing Speaking Border */}
         <div className={`avatar-photo-frame ${isSpeaking ? 'speaking' : ''}`}>
           <img src={photo} alt="Surendhar E R" className="avatar-photo" />
         </div>
 
-        {/* Equalizer Visualizer Row at the bottom of the photo */}
-        <div className="equalizer-bar-container">
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={i}
-              className={`equalizer-bar ${isSpeaking ? 'speaking' : ''}`}
-            />
-          ))}
+        {/* Circular Radial Equalizer surrounding the photo */}
+        <div className="radial-equalizer">
+          {[...Array(totalEqualizerBars)].map((_, i) => {
+            const angle = i * (360 / totalEqualizerBars)
+            const delayClass = `delay-${(i % 5) + 1}`
+            return (
+              <div
+                key={i}
+                className={`radial-bar ${isSpeaking ? 'speaking' : ''} ${delayClass}`}
+                style={{
+                  transform: `rotate(${angle}deg) translateY(-122px)`,
+                }}
+              />
+            )
+          })}
         </div>
 
         {/* Audio click indicator hint */}

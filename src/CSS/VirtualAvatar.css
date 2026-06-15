@@ -4,16 +4,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 360px;
-  height: 360px;
+  width: 400px;
+  height: 400px;
   margin: 0 auto;
   z-index: 10;
 }
 
 .avatar-wrapper {
   position: relative;
-  width: 280px;
-  height: 280px;
+  width: 320px;
+  height: 320px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -22,7 +22,7 @@
   transition: transform 0.1s ease-out;
 }
 
-/* Glowing Aura Ring behind the avatar */
+/* Glowing base aura behind photo */
 .avatar-glow-ring {
   position: absolute;
   width: 250px;
@@ -37,18 +37,45 @@
 
 .avatar-glow-ring.active {
   background: radial-gradient(circle, rgba(0, 229, 255, 0.45) 0%, rgba(124, 58, 237, 0.25) 50%, transparent 70%);
-  filter: blur(20px);
-  transform: scale(1.1);
+  filter: blur(25px);
+  transform: scale(1.15);
+}
+
+/* Concentric Speech Ripple Rings */
+.ripple-ring {
+  position: absolute;
+  width: 230px;
+  height: 230px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0, 229, 255, 0.35);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(1);
+}
+
+.ripple-ring.speaking {
+  animation: rippleEffect 2.4s infinite cubic-bezier(0.1, 0.8, 0.3, 1);
+}
+
+.ripple-ring.speaking:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+.ripple-ring.speaking:nth-child(3) {
+  animation-delay: 1.6s;
 }
 
 /* Real Photo Frame */
 .avatar-photo-frame {
   position: relative;
-  width: 240px;
-  height: 240px;
+  width: 230px;
+  height: 230px;
   border-radius: 50%;
   border: 4px solid var(--accent);
-  box-shadow: 0 0 30px rgba(0, 119, 255, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 
+              0 0 25px rgba(0, 119, 255, 0.25);
   overflow: hidden;
   background: #0f1114;
   z-index: 2;
@@ -57,8 +84,9 @@
 
 .avatar-photo-frame.speaking {
   border-color: #00e5ff;
-  box-shadow: 0 0 40px rgba(0, 229, 255, 0.6), inset 0 0 15px rgba(0, 229, 255, 0.4);
-  animation: borderGlowPulse 1.5s infinite alternate ease-in-out;
+  box-shadow: 0 0 45px rgba(0, 229, 255, 0.55), 
+              inset 0 0 15px rgba(0, 229, 255, 0.3);
+  animation: photoPulse 1.5s infinite alternate ease-in-out;
 }
 
 .avatar-photo {
@@ -73,12 +101,11 @@
   transform: scale(1.06);
 }
 
-/* Equalizer Visualizer Ring surrounding the photo */
-.equalizer-ring {
+/* Circular Radial Equalizer surrounding the photo */
+.radial-equalizer {
   position: absolute;
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
+  width: 320px;
+  height: 320px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -86,65 +113,50 @@
   pointer-events: none;
 }
 
-/* Arrange equalizer bars radially or as a waves overlay */
-.equalizer-bar-container {
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 3px;
+.radial-bar {
   position: absolute;
-  bottom: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  width: 140px;
-  height: 40px;
-  background: rgba(13, 17, 26, 0.85);
-  backdrop-filter: blur(8px);
-  border-radius: 12px;
-  border: 1.5px solid rgba(0, 229, 255, 0.25);
-  padding: 8px 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-}
-
-.equalizer-bar {
-  width: 5px;
-  height: 3px;
-  background: linear-gradient(180deg, #00e5ff, #0077ff);
+  width: 3.5px;
+  height: 10px;
+  bottom: 50%;
+  left: calc(50% - 1.75px);
+  background: linear-gradient(to top, #0077ff, #00e5ff);
   border-radius: 3px;
+  transform-origin: bottom center;
   transition: height 0.1s ease;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
 }
 
-/* Custom individual keyframes for randomized frequencies */
-.equalizer-bar.speaking {
-  animation: bounceBar 1.2s infinite ease-in-out alternate;
+/* Animations for radial bars when speaking */
+.radial-bar.speaking {
+  animation: bounceRadial 1.2s infinite ease-in-out alternate;
 }
 
-.equalizer-bar.speaking:nth-child(2n) { animation-duration: 0.8s; animation-delay: 0.1s; }
-.equalizer-bar.speaking:nth-child(3n) { animation-duration: 1.1s; animation-delay: 0.2s; }
-.equalizer-bar.speaking:nth-child(4n) { animation-duration: 0.7s; animation-delay: 0.05s; }
-.equalizer-bar.speaking:nth-child(5n) { animation-duration: 0.9s; animation-delay: 0.15s; }
+/* Class-based delays applied in loop */
+.radial-bar.speaking.delay-1 { animation-duration: 0.7s; }
+.radial-bar.speaking.delay-2 { animation-duration: 0.9s; }
+.radial-bar.speaking.delay-3 { animation-duration: 1.1s; }
+.radial-bar.speaking.delay-4 { animation-duration: 0.8s; }
+.radial-bar.speaking.delay-5 { animation-duration: 1.0s; }
 
-/* Interactive Glassmorphism Speech Bubble */
+/* Speech Bubble & Typography */
 .speech-bubble {
   position: absolute;
-  top: -85px;
+  top: -115px;
   left: 50%;
   transform: translateX(-50%);
-  width: 330px;
-  background: rgba(13, 17, 26, 0.82);
+  width: 350px;
+  background: rgba(13, 17, 26, 0.85);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1.5px solid rgba(0, 229, 255, 0.35);
   border-radius: 16px;
-  padding: 16px 36px 16px 20px;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5), 
+  padding: 18px 36px 18px 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 
               0 0 15px rgba(0, 229, 255, 0.15);
   z-index: 20;
   text-align: left;
 }
 
-/* Triangle connector for speech bubble */
 .speech-bubble::after {
   content: '';
   position: absolute;
@@ -155,18 +167,39 @@
   height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-top: 10px solid rgba(13, 17, 26, 0.82);
+  border-top: 10px solid rgba(13, 17, 26, 0.85);
   z-index: 21;
 }
 
 .speech-text {
   font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  line-height: 1.45;
-  color: #e6eef8;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(230, 238, 248, 0.7);
   margin: 0;
   font-weight: 500;
-  min-height: 40px;
+  min-height: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 6px;
+  row-gap: 4px;
+}
+
+.caption-word {
+  display: inline-block;
+  transition: all 0.15s ease;
+  color: rgba(230, 238, 248, 0.6);
+}
+
+.caption-word.active-word {
+  color: #00e5ff;
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(0, 229, 255, 0.8);
+  transform: scale(1.15) translateY(-2px);
+}
+
+.caption-word.read-word {
+  color: rgba(230, 238, 248, 0.95);
 }
 
 .speech-close {
@@ -187,16 +220,16 @@
   color: #ff4c4c;
 }
 
-/* Speak instruction tag */
+/* Instructions label */
 .avatar-hint {
   position: absolute;
-  bottom: -48px;
+  bottom: -46px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 119, 255, 0.15);
   border: 1px solid rgba(0, 229, 255, 0.3);
   border-radius: 20px;
-  padding: 4px 12px;
+  padding: 4px 14px;
   font-size: 0.72rem;
   font-family: 'Inter', sans-serif;
   font-weight: 700;
@@ -209,7 +242,7 @@
   white-space: nowrap;
 }
 
-/* Voice Settings Controls */
+/* Voice Settings Panel */
 .voice-settings-panel {
   display: flex;
   align-items: center;
@@ -267,14 +300,28 @@
   100% { opacity: 0.7; transform: translateX(-50%) scale(0.95); }
 }
 
-@keyframes borderGlowPulse {
-  0% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.35); }
-  100% { box-shadow: 0 0 40px rgba(0, 229, 255, 0.7), 0 0 10px rgba(0, 229, 255, 0.3); }
+@keyframes photoPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.04); }
 }
 
-@keyframes bounceBar {
-  0% { height: 3px; }
-  100% { height: 26px; }
+@keyframes rippleEffect {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+@keyframes bounceRadial {
+  0% { height: 10px; }
+  100% { height: 35px; }
 }
 
 @media (max-width: 900px) {
@@ -283,19 +330,19 @@
     height: 320px;
   }
   .avatar-wrapper {
-    width: 240px;
-    height: 240px;
+    width: 250px;
+    height: 250px;
   }
   .avatar-photo-frame {
-    width: 200px;
-    height: 200px;
+    width: 190px;
+    height: 190px;
   }
-  .equalizer-bar-container {
-    width: 120px;
-    bottom: 5px;
+  .radial-equalizer {
+    width: 250px;
+    height: 250px;
   }
   .speech-bubble {
-    width: 280px;
-    top: -95px;
+    width: 290px;
+    top: -115px;
   }
 }
