@@ -281,34 +281,6 @@ export default function VirtualAvatar() {
         </button>
       </div>
 
-      {/* Synchronized Captions Speech Bubble - Placed clearly below the voice controls */}
-      <AnimatePresence>
-        {showSpeech && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="speech-bubble-bottom"
-          >
-            <p className="speech-text">
-              {captionWords.map((word, idx) => {
-                let wordClass = "caption-word"
-                if (idx === currentWordIndex) {
-                  wordClass += " active-word"
-                } else if (idx < currentWordIndex) {
-                  wordClass += " read-word"
-                }
-                return (
-                  <span key={idx} className={wordClass}>
-                    {word}
-                  </span>
-                )
-              })}
-            </p>
-            <button className="speech-close-bottom" onClick={() => setShowSpeech(false)}>×</button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
