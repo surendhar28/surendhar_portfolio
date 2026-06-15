@@ -19,7 +19,7 @@ export default function VirtualAvatar() {
   const [selectedVoiceName, setSelectedVoiceName] = useState('')
   const currentUtteranceRef = useRef(null)
 
-  const photo = '/photo.jpg'
+  const photo = '/avatar.png'
   const totalEqualizerBars = 32
 
   const messages = [
@@ -66,14 +66,23 @@ export default function VirtualAvatar() {
     const loadVoices = () => {
       if (typeof window === 'undefined' || !window.speechSynthesis) return
       const systemVoices = window.speechSynthesis.getVoices()
-      // Filter English or common local voices
-      const filtered = systemVoices.filter(v => v.lang.startsWith('en') || v.lang.startsWith('hi'))
-      setVoices(filtered.length > 0 ? filtered : systemVoices)
+      setVoices(systemVoices)
 
-      // Auto-select a voice if none is selected
-      if (filtered.length > 0 && !selectedVoiceName) {
-        const defaultVoice = filtered.find(v => v.default) || filtered[0]
-        setSelectedVoiceName(defaultVoice.name)
+      // Find Google UK English Male voice or similar en-GB Male voice, or fallback to en-GB
+      let ukMaleVoice = systemVoices.find(v => v.name.includes('Google UK English Male'))
+      if (!ukMaleVoice) {
+        ukMaleVoice = systemVoices.find(v => v.lang === 'en-GB' && v.name.toLowerCase().includes('male'))
+      }
+      if (!ukMaleVoice) {
+        ukMaleVoice = systemVoices.find(v => v.lang === 'en-GB')
+      }
+      if (!ukMaleVoice) {
+        ukMaleVoice = systemVoices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('male'))
+      }
+      
+      const targetVoice = ukMaleVoice || systemVoices.find(v => v.default) || systemVoices[0]
+      if (targetVoice) {
+        setSelectedVoiceName(targetVoice.name)
       }
     }
 
@@ -179,35 +188,6 @@ export default function VirtualAvatar() {
 
   return (
     <div className="avatar-container" ref={avatarRef}>
-      {/* Synchronized Captions Speech Bubble */}
-      <AnimatePresence>
-        {showSpeech && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 10 }}
-            className="speech-bubble"
-          >
-            <p className="speech-text">
-              {captionWords.map((word, idx) => {
-                let wordClass = "caption-word"
-                if (idx === currentWordIndex) {
-                  wordClass += " active-word"
-                } else if (idx < currentWordIndex) {
-                  wordClass += " read-word"
-                }
-                return (
-                  <span key={idx} className={wordClass}>
-                    {word}
-                  </span>
-                )
-              })}
-            </p>
-            <button className="speech-close" onClick={() => setShowSpeech(false)}>×</button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Floating 3D base frame */}
       <motion.div
         className="avatar-wrapper"
@@ -232,6 +212,29 @@ export default function VirtualAvatar() {
         {/* Real Photo Card with Glowing Speaking Border */}
         <div className={`avatar-photo-frame ${isSpeaking ? 'speaking' : ''}`}>
           <img src={photo} alt="Surendhar E R" className="avatar-photo" />
+
+          {/* Animated Mouth Overlay to simulate speaking on photo */}
+          {isSpeaking && (
+            <div className="mouth-overlay">
+              <svg viewBox="0 0 100 40" className="mouth-svg">
+                {/* Dynamically opens and closes lips in sync with speaking state */}
+                <motion.path
+                  d="M 15 20 Q 50 20 85 20 Q 50 20 15 20"
+                  animate={{
+                    d: [
+                      "M 15 20 Q 50 34 85 20 Q 50 20 15 20", // open mouth shape
+                      "M 15 20 Q 50 25 85 20 Q 50 20 15 20", // near closed shape
+                      "M 15 20 Q 50 31 85 20 Q 50 22 15 20"  // semi-open shape
+                    ]
+                  }}
+                  transition={{ duration: 0.18, repeat: Infinity, repeatType: "mirror" }}
+                  fill="#1c0a05"
+                  stroke="#33180c"
+                  strokeWidth="2.5"
+                />
+              </svg>
+            </div>
+          )}
         </div>
 
         {/* Circular Radial Equalizer surrounding the photo */}
@@ -257,7 +260,7 @@ export default function VirtualAvatar() {
         </div>
       </motion.div>
 
-      {/* Voice Selection & Control Panel */}
+      {/* Voice Settings Controls (Mute/Replay) */}
       <div className="voice-settings-panel">
         <button
           className="voice-btn-icon"
@@ -276,23 +279,36 @@ export default function VirtualAvatar() {
         >
           <RotateCcw size={14} />
         </button>
-
-        {voices.length > 0 && (
-          <select
-            className="voice-select"
-            value={selectedVoiceName}
-            onChange={handleVoiceChange}
-            onClick={(e) => e.stopPropagation()}
-            title="Select Avatar Voice"
-          >
-            {voices.map((v) => (
-              <option key={v.name} value={v.name}>
-                {v.name.replace("Microsoft", "").replace("Desktop", "").trim()}
-              </option>
-            ))}
-          </select>
-        )}
       </div>
+
+      {/* Synchronized Captions Speech Bubble - Placed clearly below the voice controls */}
+      <AnimatePresence>
+        {showSpeech && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            className="speech-bubble-bottom"
+          >
+            <p className="speech-text">
+              {captionWords.map((word, idx) => {
+                let wordClass = "caption-word"
+                if (idx === currentWordIndex) {
+                  wordClass += " active-word"
+                } else if (idx < currentWordIndex) {
+                  wordClass += " read-word"
+                }
+                return (
+                  <span key={idx} className={wordClass}>
+                    {word}
+                  </span>
+                )
+              })}
+            </p>
+            <button className="speech-close-bottom" onClick={() => setShowSpeech(false)}>×</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
