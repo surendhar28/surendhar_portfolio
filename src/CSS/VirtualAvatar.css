@@ -1,0 +1,188 @@
+.avatar-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 340px;
+  height: 340px;
+  margin: 0 auto;
+  z-index: 10;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: transform 0.1s ease-out;
+}
+
+/* Glowing Aura Ring behind the avatar */
+.avatar-glow-ring {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 119, 255, 0.2) 0%, rgba(124, 58, 237, 0.05) 50%, transparent 70%);
+  filter: blur(15px);
+  z-index: -1;
+  transition: all 0.5s ease;
+  animation: pulseGlow 4s infinite alternate ease-in-out;
+}
+
+.avatar-glow-ring.active {
+  background: radial-gradient(circle, rgba(0, 229, 255, 0.35) 0%, rgba(124, 58, 237, 0.15) 50%, transparent 70%);
+  filter: blur(20px);
+  transform: scale(1.1);
+}
+
+.avatar-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 15px 35px rgba(2, 6, 23, 0.5));
+}
+
+/* Interactive Glassmorphism Speech Bubble */
+.speech-bubble {
+  position: absolute;
+  top: -95px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  background: rgba(13, 17, 26, 0.75);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(0, 119, 255, 0.3);
+  border-radius: 16px;
+  padding: 16px 36px 16px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 
+              0 0 15px rgba(0, 119, 255, 0.1);
+  z-index: 20;
+  text-align: left;
+}
+
+/* Triangle connector for speech bubble */
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid rgba(13, 17, 26, 0.75);
+  z-index: 21;
+}
+
+/* Outer glowing border indicator */
+.speech-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 11px solid rgba(0, 119, 255, 0.3);
+  z-index: 20;
+}
+
+.speech-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #e6eef8;
+  margin: 0;
+  font-weight: 500;
+  min-height: 40px;
+}
+
+.speech-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+
+.speech-close:hover {
+  color: #ff4c4c;
+}
+
+/* Click suggestion tag */
+.avatar-hint {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 119, 255, 0.15);
+  border: 1px solid rgba(0, 229, 255, 0.3);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  color: #00e5ff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.1);
+  animation: pulseHint 2s infinite ease-in-out;
+  pointer-events: none;
+}
+
+@keyframes pulseGlow {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes pulseHint {
+  0% {
+    opacity: 0.7;
+    transform: translateX(-50%) scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+  }
+  100% {
+    opacity: 0.7;
+    transform: translateX(-50%) scale(0.95);
+  }
+}
+
+@media (max-width: 900px) {
+  .avatar-container {
+    width: 280px;
+    height: 280px;
+  }
+  .avatar-wrapper {
+    width: 220px;
+    height: 220px;
+  }
+  .speech-bubble {
+    width: 280px;
+    top: -95px;
+  }
+}

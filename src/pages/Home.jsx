@@ -2,10 +2,11 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import "../CSS/Home.css"
 import '../index.css'
+import VirtualAvatar from '../components/VirtualAvatar'
+import ParticleCanvas from '../components/ParticleCanvas'
 
 
 // 🖼️ Assets are in public directory, accessed via direct paths
-const photo = '/photo.jpg'
 const githubLogo = '/github.png'
 const linkedinLogo = '/linkedin.png'
 const gmailLogo = '/gmail.png'
@@ -33,6 +34,9 @@ export default function Home() {
 
   return (
     <section className="home-section">
+      {/* Background Interactive Graphics */}
+      <ParticleCanvas />
+
       {/* Typing Effect Styles */}
       <style>
         {`
@@ -41,34 +45,17 @@ export default function Home() {
         `}
       </style>
 
-      {/* Top Section: Photo + Info */}
+      {/* Top Section: Avatar + Info */}
       <div className="home-top">
-        {/* Left: Glowing Photo */}
+        {/* Left: Interactive Virtual Avatar */}
         <motion.div
-          initial={{ opacity: 0, x: -60 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
           className="photo-container"
+          style={{ zIndex: 10 }}
         >
-          <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-            className="photo-ring"
-          />
-          <motion.div
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            className="photo-frame"
-          >
-            <motion.img
-              src={photo}
-              alt="Surendhar E R"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1 }}
-              className="profile-photo"
-            />
-          </motion.div>
+          <VirtualAvatar />
         </motion.div>
 
         {/* Right: Info Section */}
