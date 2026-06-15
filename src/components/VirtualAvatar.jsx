@@ -212,29 +212,6 @@ export default function VirtualAvatar() {
         {/* Real Photo Card with Glowing Speaking Border */}
         <div className={`avatar-photo-frame ${isSpeaking ? 'speaking' : ''}`}>
           <img src={photo} alt="Surendhar E R" className="avatar-photo" />
-
-          {/* Animated Mouth Overlay to simulate speaking on photo */}
-          {isSpeaking && (
-            <div className="mouth-overlay">
-              <svg viewBox="0 0 100 40" className="mouth-svg">
-                {/* Dynamically opens and closes lips in sync with speaking state */}
-                <motion.path
-                  d="M 15 20 Q 50 20 85 20 Q 50 20 15 20"
-                  animate={{
-                    d: [
-                      "M 15 20 Q 50 34 85 20 Q 50 20 15 20", // open mouth shape
-                      "M 15 20 Q 50 25 85 20 Q 50 20 15 20", // near closed shape
-                      "M 15 20 Q 50 31 85 20 Q 50 22 15 20"  // semi-open shape
-                    ]
-                  }}
-                  transition={{ duration: 0.18, repeat: Infinity, repeatType: "mirror" }}
-                  fill="#1c0a05"
-                  stroke="#33180c"
-                  strokeWidth="2.5"
-                />
-              </svg>
-            </div>
-          )}
         </div>
 
         {/* Circular Radial Equalizer surrounding the photo */}

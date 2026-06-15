@@ -338,22 +338,3 @@
   }
 }
 
-/* Mouth Speaking Overlay inside the Photo Frame */
-.mouth-overlay {
-  position: absolute;
-  top: 48.5%;
-  left: 47.5%;
-  transform: translate(-50%, -50%);
-  width: 44px;
-  height: 20px;
-  z-index: 5;
-  pointer-events: none;
-  mix-blend-mode: multiply;
-  opacity: 0.95;
-}
-
-.mouth-svg {
-  width: 100%;
-  height: 100%;
-}
-
